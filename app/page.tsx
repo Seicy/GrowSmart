@@ -307,3 +307,4 @@ function Activity({ size, className }: any) {
     </svg>
   );
 }
+/* --- 3. CONFIGURATION TAB --- */
