@@ -14,7 +14,7 @@ export default function LandingPage() {
           </div>
           <span className="font-bold text-xl tracking-tight">GrowSmart <span className="text-emerald-500"></span></span>
         </div>
-        <Link href="/login">
+        <Link href="auth/login">
           <button className="bg-slate-900 text-white px-8 py-3 rounded-2xl text-xs font-black hover:bg-emerald-600 transition-all shadow-xl shadow-slate-200 uppercase tracking-widest">
             Login
           </button>

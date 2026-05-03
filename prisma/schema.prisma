@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Plant {
+  id        Int          @id @default(autoincrement())
+  name      String
+  type      String
+  createdAt DateTime     @default(now())
+
+  sensorData SensorData[]
+}
+
+model SensorData {
+  id           Int      @id @default(autoincrement())
+  temperature  Float
+  humidity     Float
+  soilMoisture Float
+  createdAt    DateTime @default(now())
+
+  plantId Int
+  plant   Plant @relation(fields: [plantId], references: [id])
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
