@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   Sprout, 
   Settings2, 
@@ -17,6 +18,13 @@ export default function ConfigurationPage() {
   const [isWatering, setIsWatering] = useState(false);
   // Tambahkan state untuk Dark Mode
   const [isDark, setIsDark] = useState(false);
+  const router = useRouter();
+
+const handleLogout = async () => {
+  await fetch("/api/logout", { method: "POST" });
+  router.push("/auth/login");
+  router.refresh();
+};
 
   return (
     <div className={`min-h-screen p-8 font-sans transition-all duration-500 ${isDark ? 'bg-[#0B0F10]' : 'bg-[#F0F4F4]'}`}>
@@ -44,9 +52,12 @@ export default function ConfigurationPage() {
           >
             {isDark ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-          <button className="bg-[#FF4D12] text-white px-6 py-3 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg shadow-orange-200/20 transition-all hover:scale-105">
-            Log out <LogOut size={16} />
-          </button>
+<button
+  onClick={handleLogout}
+  className="bg-[#FF4D12] text-white px-6 py-3 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg shadow-orange-200/20 hover:scale-105 transition-all"
+>
+  Log out <LogOut size={16} />
+</button>
         </div>
       </nav>
 

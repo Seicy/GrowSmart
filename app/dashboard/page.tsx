@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   Sprout, 
   Thermometer, 
@@ -15,6 +16,12 @@ import Link from 'next/link';
 
 export default function MonitoringPage() {
   const [isDark, setIsDark] = useState(false);
+  const router = useRouter();
+  const handleLogout = async () => {
+  await fetch("/api/logout", { method: "POST" });
+  router.push("/auth/login");
+  router.refresh();
+};
 
   return (
     <div className={`min-h-screen transition-all duration-500 p-8 font-sans ${isDark ? 'bg-[#0B0F10]' : 'bg-[#F0F4F4]'}`}>
@@ -38,9 +45,12 @@ export default function MonitoringPage() {
           <button onClick={() => setIsDark(!isDark)} className={`p-3 rounded-full transition-all ${isDark ? 'bg-slate-700 text-yellow-400' : 'bg-slate-100 text-slate-600'}`}>
             {isDark ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-          <button className="bg-[#FF4D12] text-white px-6 py-3 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg shadow-orange-200/20 hover:scale-105 transition-all">
-            Log out <LogOut size={16} />
-          </button>
+<button
+  onClick={handleLogout}
+  className="bg-[#FF4D12] text-white px-6 py-3 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg shadow-orange-200/20 hover:scale-105 transition-all"
+>
+  Log out <LogOut size={16} />
+</button>
         </div>
       </nav>
 
