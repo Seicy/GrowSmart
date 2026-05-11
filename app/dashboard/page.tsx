@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Sprout, 
@@ -16,12 +16,22 @@ import Link from 'next/link';
 
 export default function MonitoringPage() {
   const [isDark, setIsDark] = useState(false);
+  const [userName, setUserName] = useState("...");
   const router = useRouter();
+
+  useEffect(() => {
+    fetch("/api/me")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) setUserName(data.user.name);
+      });
+  }, []);
+
   const handleLogout = async () => {
-  await fetch("/api/logout", { method: "POST" });
-  router.push("/auth/login");
-  router.refresh();
-};
+    await fetch("/api/logout", { method: "POST" });
+    router.push("/auth/login");
+    router.refresh();
+  };
 
   return (
     <div className={`min-h-screen transition-all duration-500 p-8 font-sans ${isDark ? 'bg-[#0B0F10]' : 'bg-[#F0F4F4]'}`}>
@@ -59,7 +69,7 @@ export default function MonitoringPage() {
         
         {/* GREETING */}
         <div className="mb-10">
-          <h2 className={`text-xl ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Hello, <span className={`${isDark ? 'text-white' : 'text-slate-900'} font-bold`}>Rafif</span> 👋</h2>
+          <h2 className={`text-xl ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Hello, <span className={`${isDark ? 'text-white' : 'text-slate-900'} font-bold`}>{userName}</span> 👋</h2>
           <h1 className={`text-3xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>Real-time Monitoring Greenhouse</h1>
         </div>
 

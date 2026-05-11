@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Sprout, 
@@ -19,6 +19,39 @@ export default function ConfigurationPage() {
   // Tambahkan state untuk Dark Mode
   const [isDark, setIsDark] = useState(false);
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+// Load config saat halaman dibuka
+useEffect(() => {
+  fetch("/api/config")
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        setThreshold(data.config.soilThreshold);
+        setIsWatering(data.config.manualWatering);
+      }
+    });
+}, []);
+
+// Fungsi save
+const handleSave = async () => {
+  setLoading(true);
+  const res = await fetch("/api/config", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      soilThreshold: threshold,
+      manualWatering: isWatering,
+    }),
+  });
+  const data = await res.json();
+  if (data.success) {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }
+  setLoading(false);
+};
 
 const handleLogout = async () => {
   await fetch("/api/logout", { method: "POST" });
@@ -124,9 +157,18 @@ const handleLogout = async () => {
             </div>
 
             {/* SAVE BUTTON */}
-            <button className={`w-full py-6 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl transition-all flex items-center justify-center gap-3 active:scale-95 ${isDark ? 'bg-[#00B67A] hover:bg-[#009e6a] shadow-emerald-900/10' : 'bg-[#00B67A] hover:bg-[#009e6a] shadow-emerald-100'}`}>
-              <Save size={18} /> Save Configuration
-            </button>
+<button
+  onClick={handleSave}
+  disabled={loading}
+  className={`w-full py-6 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${isDark ? 'bg-[#00B67A] hover:bg-[#009e6a] shadow-emerald-900/10' : 'bg-[#00B67A] hover:bg-[#009e6a] shadow-emerald-100'}`}
+>
+  {loading ? (
+    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+  ) : (
+    <Save size={18} />
+  )}
+  {saved ? "Tersimpan ✓" : loading ? "Menyimpan..." : "Save Configuration"}
+</button>
           </div>
 
         </div>
