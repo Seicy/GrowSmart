@@ -7,47 +7,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Plant {
-  id        Int          @id @default(autoincrement())
-  name      String
-  type      String
-  createdAt DateTime     @default(now())
-
-  sensorData SensorData[]
+model config {
+  id             Int      @id @default(autoincrement())
+  soilThreshold  Int      @default(30)
+  manualWatering Boolean  @default(false)
+  updatedAt      DateTime
 }
 
-model SensorData {
+model log {
+  id        Int      @id @default(autoincrement())
+  type      String
+  title     String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model plant {
+  id         Int          @id @default(autoincrement())
+  name       String
+  type       String
+  createdAt  DateTime     @default(now())
+  sensordata sensordata[]
+}
+
+model sensordata {
   id             Int      @id @default(autoincrement())
   temperature    Float
   humidity       Float
   soilMoisture   Float
-  motionDetected Boolean  @default(false) // <--- Tambahkan field ini
-  plantId        Int
-  plant          Plant    @relation(fields: [plantId], references: [id])
   createdAt      DateTime @default(now())
+  plantId        Int
+  motionDetected Boolean  @default(false)
+  plant          plant    @relation(fields: [plantId], references: [id], map: "SensorData_plantId_fkey")
+
+  @@index([plantId], map: "SensorData_plantId_fkey")
 }
 
-
-
-model User {
+model user {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
+  email     String   @unique(map: "User_email_key")
   password  String
+  createdAt DateTime @default(now())
   name      String   @default("User")
-  createdAt DateTime @default(now())
-}
-
-model Config {
-  id             Int      @id @default(autoincrement())
-  soilThreshold  Int      @default(30)
-  manualWatering Boolean  @default(false)
-  updatedAt      DateTime @updatedAt
-}
-
-model Log {
-  id        Int      @id @default(autoincrement())
-  type      String   // "pest", "watering", "connected", "config"
-  title     String
-  message   String
-  createdAt DateTime @default(now())
 }

@@ -86,16 +86,35 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // --- LOGIKA OTOMATISASI SECURITY LOG (PIR) ---
-    if (motionDetected === true) {
-      await prisma.log.create({
-        data: {
-          type: "security",
-          title: "Pergerakan Terdeteksi",
-          message: "Sensor PIR mendeteksi adanya aktivitas pergerakan di dalam area Greenhouse.",
-        },
-      });
-    }
+
+// --- LOGIKA SECURITY LOG DENGAN COOLDOWN 30 DETIK ---
+if (motionDetected) {
+
+  const cooldownTime = new Date(Date.now() - 60 * 1000);
+
+  const recentLog = await prisma.log.findFirst({
+    where: {
+      type: "security",
+      createdAt: {
+        gte: cooldownTime,
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  if (!recentLog) {
+    await prisma.log.create({
+      data: {
+        type: "security",
+        title: "Pergerakan Terdeteksi",
+        message:
+          "Sensor PIR mendeteksi adanya aktivitas pergerakan di dalam area Greenhouse.",
+      },
+    });
+  }
+}
 
     return NextResponse.json({ success: true, message: "Data berhasil disimpan", data });
   } catch (error) {
